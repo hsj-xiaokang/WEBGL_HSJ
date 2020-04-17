@@ -1,0 +1,136 @@
+<!DOCTYPE HTML>
+<head>
+    
+</head>
+<html>
+    <body onload="main()">
+        <canvas id="webgl" width="500" height="500" style="border: 1px solid #ff0000;">
+            
+        </canvas>
+
+        <script type="text/javascript">
+            //顶点着色器程序
+            //WebGL着色器语言之所以规定attribute这样一个关键字，目的是为了javascript可以调用相关的WebGL API把顶点相关数据从javascript传递给顶点着色器attribute声明的变量。
+            var VSHADER_SOURCE = 
+                    'attribute vec4 a_Position;'+
+                    'void main(){\n'+
+                        'gl_Position = a_Position;\n'+
+                    '}\n';
+
+            //片元着色器程序
+            var FSHADER_SOURCE =
+                    'void main(){'+
+                        'gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);\n'+
+                    '}\n';
+
+            function main(){
+                //获取<canvas>元素
+                var canvas = document.getElementById("webgl");
+                if(!canvas){
+                    console.log('error');
+                    return;
+                }
+
+                //获取绘制三维图形的绘图上下文
+                var gl = canvas.getContext('webgl');
+
+                // 创建着色器对象
+                const fShader = gl.createShader(gl.FRAGMENT_SHADER);
+                const vShader = gl.createShader(gl.VERTEX_SHADER);
+
+                // 将着色器源码写入对象
+                gl.shaderSource(vShader, VSHADER_SOURCE);
+                gl.shaderSource(fShader, FSHADER_SOURCE);
+
+                // 编译着色器
+                gl.compileShader(vShader);
+                gl.compileShader(fShader);
+
+                // 创建程序
+                const program = gl.createProgram();
+
+                // 程序绑定着色器
+                gl.attachShader(program, vShader);
+                gl.attachShader(program, fShader);
+
+                // 链接程序
+                gl.linkProgram(program);
+
+                // 使用程序
+                gl.useProgram(program);
+
+                var n = initVertexBuffers(gl);
+                if(n < 0){
+                    console.log('Failed to set positions of vertices');
+                    return;
+                }
+
+                gl.drawArrays(gl.TRIANGLE_STRIP, 0, n);
+
+                function initVertexBuffers(gl){
+                    var vertices = new Float32Array([-0.5, 0.5, 0.0,-0.5, -0.5, 0.0, 0.5, 0.5, 0.0, 0.5, -0.5 ,0.0,]);  //坐标点位置
+                    var n = 4;  //坐标点个数
+
+                    //创建缓冲区对象
+                    var vertexBuffer = gl.createBuffer();
+                    if(!vertexBuffer){
+                        console.log('Failed to create the buffer object');
+                        return -1;
+                    }
+
+                    //将缓冲区对象绑定到目标
+                    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+
+                    //向缓冲区对象中写入数据
+                    gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+
+                    var a_Position = gl.getAttribLocation(program, 'a_Position');
+                    if(a_Position < 0){
+                        console.log('Failed to get the storage location of a_Position');
+                        return;
+                    }
+
+                    //将缓冲区对象分配给a_Position变量
+                    //void gl .vertexAttribPointer（index，size，type，normalized，stride，offset）;
+                    /**
+                    index
+                    甲GLuint指定顶点属性，该属性要被修改的索引。
+
+                    size
+                    甲GLint指定每个顶点属性组件的数量。必须为1、2、3或4。
+
+                    type
+                    甲GLenum指定阵列中的每个组件的数据类型。可能的值：
+                    gl.BYTE：带符号的8位整数，其值在[-128，127]中
+                    gl.SHORT：带符号的16位整数，其值在[-32768，32767]中
+                    gl.UNSIGNED_BYTE：无符号8位整数，值在[0，255]中
+                    gl.UNSIGNED_SHORT：无符号16位整数，值在[0，65535]中
+                    gl.FLOAT：32位IEEE浮点数
+                    使用WebGL 2上下文时，还可以使用以下值：
+                    gl.HALF_FLOAT：16位IEEE浮点数
+
+                    normalized
+                    GLboolean指定在将整数数据值转换为浮点数时是否应将其标准化到某个范围。
+                    对于类型gl.BYTE和gl.SHORT，如果为true，则将值标准化为[-1，1]。
+                    对于类型gl.UNSIGNED_BYTE和gl.UNSIGNED_SHORT，如果为true，则将值标准化为[0，1]。
+                    对于类型gl.FLOAT和gl.HALF_FLOAT，此参数无效。
+
+                    stride
+                    甲GLsizei在连续顶点属性的开始之间的字节指定偏移量。不能大于255。如果stride为0，则假定该属性紧紧包装，即，该属性未交织，但每个属性在单独的块中，并且下一个顶点的属性紧随当前顶点之后。
+                    
+                    offset
+                    甲GLintptr在顶点属性阵列中的第一组分的字节指定偏移。必须是的字节长度的倍数  type。
+                    
+                    
+                    **/
+                    gl.vertexAttribPointer(a_Position, 3, gl.FLOAT, false, 0, 0);
+
+                    //连接a_Position变量与分配给它的缓冲区对象
+                    gl.enableVertexAttribArray(a_Position);
+
+                    return n;
+                }
+            }
+        </script>
+    </body>
+</html>
