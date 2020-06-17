@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+</head>
+<body>
+    <div id="img"></div>
+    <script>
+        // 获取 id为 img 的元素
+        var img = document.getElementById('img');
+        // 创建 Image对象
+        var imgObj = new Image();
+        // 为 src 属性赋值
+        imgObj.src = "./mm.jpeg";
+        // 将 Image对象插入到 img元素中
+        img.appendChild(imgObj);
+        // 当 imgObj 加载完毕后触发事件
+        imgObj.onload = function () {
+            // 控制台打印 Image对象的 宽 和 高
+            console.log(imgObj.width + "----" + imgObj.height);
+        };
+    </script>
+</body>
+</html>
