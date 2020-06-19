@@ -161,6 +161,7 @@ function initEventHandlers(canvas, currentAngle) {
   canvas.onmousemove = function(ev) { // Mouse is moved
     var x = ev.clientX, y = ev.clientY;
     if (dragging) {
+      //设置canvas移动每个单位的度数，总数是100度计算出每一单位度数，可以自己设置
       var factor = 100/canvas.height; // The rotation ratio
       var dx = factor * (x - lastX);
       var dy = factor * (y - lastY);
